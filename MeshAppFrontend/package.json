@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@angular/cli": "^6.2.5"
+    "@angular/cli": "^6.2.5",
+    "chart.js": "^2.7.3"
   }
 }
