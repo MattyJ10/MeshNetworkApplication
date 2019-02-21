@@ -9,7 +9,6 @@ import { Chart } from 'chart.js';
 })
 export class HomeComponent implements OnInit {
 
-	public data:any; 
     public testChart:any = []; 
 
   constructor(private meshService: MeshService) { }
@@ -22,10 +21,29 @@ export class HomeComponent implements OnInit {
       this.meshService.test().subscribe(
           res => {
             console.log(res.data); 
-            this.data = res.data;
+            //res.data = res.data.split('{'); 
+            //let sentData = res.data.sentPackets; 
+            //let receivedData = res.data.receivedPackets;
             let array = []; 
+            let sentPackets = []; 
+            let receivedPackets = []; 
             let chartData = []; 
-            let chartLabels = []; 
+            let chartLabels = [];
+
+           /* for (let key in sentData) {
+                sentPackets.push(sentData[key]);  
+            }
+            for (let key in receivedData) {
+                receivedPackets.push(receivedData[key]); 
+            }
+            sentPackets.sort(function(a, b) {
+                return b[1] - a[1]; 
+            });
+            receivedPackets.sort(function(a, b) {
+                return b[1] - a[1]; 
+            });*/
+
+
             /*
             for (let ip in res.data) {
                 array.push([ip, res.data[ip]]);
