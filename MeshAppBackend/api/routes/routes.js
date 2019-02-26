@@ -26,6 +26,4 @@ module.exports = function(app, express) {
         	console.log(data.toString()); 
    	 	});
 	});
-
-
 }
