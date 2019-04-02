@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
 export class MeshService {
 
 	public test(): Observable<any>  {
-		return this.http.get('http://localhost:3005/api/test')
+		return this.http.get('http://172.27.0.82:3030/getFile')
 	}
 
   constructor(private http: HttpClient) { }

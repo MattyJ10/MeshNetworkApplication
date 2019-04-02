@@ -2,6 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { MeshService } from '../mesh.service'; 
 import { Chart } from 'chart.js'; 
 
+/*
+    Pi IPs:
+    172.27.0.15 (gateway)
+    172.27.0.32 (access point)
+    172.27.0.12 (routing)
+    172.27.0.90 (access point) 
+    172.27.0.78 (routing)
+    */
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -20,7 +29,7 @@ export class HomeComponent implements OnInit {
       
       this.meshService.test().subscribe(
           res => {
-            console.log(res.data); 
+            console.log(res); 
             //res.data = res.data.split('{'); 
             //let sentData = res.data.sentPackets; 
             //let receivedData = res.data.receivedPackets;
