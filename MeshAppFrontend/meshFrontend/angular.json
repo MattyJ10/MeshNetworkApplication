@@ -23,9 +23,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css", "node_modules/vis/dist/vis.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/vis/dist/vis.min.js"]
           },
           "configurations": {
             "production": {

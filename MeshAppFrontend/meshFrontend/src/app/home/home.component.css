@@ -1,0 +1,26 @@
+.graph-container {
+	height: 700px; 
+	width: 70%;
+	margin: 0px auto;
+}
+
+ngx-graph {
+	height: 700px;
+	width: 50%;
+}
+
+.node:hover {
+	cursor:pointer;
+}
+
+#mynetwork {
+    border: 5px solid blue;
+    background: white;
+    display: inline-block;
+    height: 500px;
+    width: 50%;
+}
+
+.network {
+	text-align: center;
+}
