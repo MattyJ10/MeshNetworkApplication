@@ -156,6 +156,10 @@ export class HomeComponent implements OnInit {
         let trafficCounts = [];
         let lengths = [];  
         let protocolCounts = {};
+        for (let key in this.networkData) {
+            trafficCounts.push(this.networkData[key].count); 
+            lengths.push(this.networkData[key].length); 
+        }
         this.createNetGraph();
         this.trafficChart = new Chart('traffic', {
             type: 'bar',

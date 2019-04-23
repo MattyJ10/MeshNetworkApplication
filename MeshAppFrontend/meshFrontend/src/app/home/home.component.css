@@ -14,7 +14,7 @@ ngx-graph {
 }
 
 #mynetwork {
-    border: 5px solid blue;
+    border: 5px solid;
     background: white;
     display: inline-block;
     height: 500px;
