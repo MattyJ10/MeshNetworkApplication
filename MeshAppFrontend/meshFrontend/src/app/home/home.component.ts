@@ -24,44 +24,61 @@ export class HomeComponent implements OnInit {
 
     public trafficChart:any = [];
     public lengthChart:any = []; 
-    public piCharts:any = {};  
+    public totalProtChart:any = []; 
     public ips = ["172.27.0.15", "172.27.0.32", "172.27.0.12", "172.27.0.90", "172.27.0.78"]; 
     public clickedIP; 
     public networkData: any; 
     public networkLinks: any; 
     public IPChart:any = []; 
-    enableMultiEdges = true;
+
+    //modal variables
+    public viewingIp; 
+    public packetChart:any = []; 
+    public protChart:any = []; 
+
+    public currentTab; 
+
     graphData = {};
     @ViewChild('graphContainer') graph: ElementRef;
 
     constructor(private meshService: MeshService) { }
 
     ngOnInit() {
-        //get the data files on init and then display the charts based on which is selected
-        //get all the IPs for nodes and populate the ip list
+        //first, get IPs and Link Files
+        //Second get Packet Data
+        // this.meshService.getLinks().subscribe(
+        //     data => {
+        //         console.log(data); 
+        //     })
+        // this.meshService.getPacketData().subscribe(
+        //     data => {
+        //         console.log(data); 
+        //     })
+        this.currentTab = "network";
+        this.networkData = {"172.27.0.15": {"172.27.0.90": {"count": 287}, "totalsize": 64440, "count": 287, "protocol": {"TCP": 240, "DATA-TEXT-LINES": 2, "JSON": 19, "HTTP": 26}, "length": 224}, 
+                            "172.27.0.78": {"totalsize": 630244, "port": {}, "224.0.0.251": {"count": 389}, "count": 5095, "172.27.0.90": {"count": 4618}, "172.27.255.255": {"count": 3}, "35.222.85.5": {"count": 11}, "35.224.99.156": {"count": 74}, "protocol": {"TCP": 137, "NBNS": 3, "DATA-TEXT-LINES": 1, "HTTP": 24, "_WS.MALFORMED": 1, "JSON": 7, "DNS": 4922}, "length": 123}, 
+                            "172.27.0.90": {"totalsize": 764260, "port": {}, "172.27.0.82": {"count": 4618}, "172.27.0.115": {"count": 10}, "count": 5313, "172.27.0.78": {"count": 287}, "172.27.0.135": {"count": 62}, "172.27.0.32": {"count": 336}, "protocol": {"TCP": 540, "DATA-TEXT-LINES": 3, "HTTP": 59, "_WS.MALFORMED": 1, "BOOTP": 116, "JSON": 51, "DNS": 4543}, "length": 143}, 
+                            "172.27.0.32": {"totalsize": 86898, "port": {}, "count": 336, "172.27.0.90": {"count": 336}, "protocol": {"TCP": 232, "BOOTP": 54, "JSON": 25, "HTTP": 25}, "length": 258}, 
+                            "172.27.0.12": {"172.27.0.90": {"count": 62}, "totalsize": 21204, "count": 62, "protocol": {"BOOTP": 62}, "length": 342}, 
+                            "172.27.0.115": {"173.194.12.91": {"count": 12}, "protocol": {"QUIC": 410, "TCP": 48, "SSL": 17, "HTTP": 16, "XML": 1, "DNS": 12}, "224.0.0.251": {"count": 2}, "172.217.6.78": {"count": 31}, "port": {}, "172.27.0.90": {"count": 10}, "239.255.255.250": {"count": 15}, "172.217.6.68": {"count": 19}, "length": 803, "172.217.0.42": {"count": 35}, "74.125.170.123": {"count": 11}, "74.125.170.122": {"count": 298}, "count": 504, "52.49.211.202": {"count": 13}, "216.58.194.174": {"count": 31}, "216.58.195.67": {"count": 5}, "172.217.5.106": {"count": 15}, "totalsize": 405081, "216.58.195.68": {"count": 7}}};  
+        this.networkLinks = {"172.27.0.15": ["172.27.0.90", "172.27.0.12", "172.27.0.32", "172.27.0.78"], "172.27.0.32": ["172.27.0.12"], "172.27.0.12": ["172.27.0.90"], "172.27.0.90": ["172.27.0.78"]};
         this.getData(); 
-    }
-
-    clickedNode(entry) {
-        console.log(entry); 
-        this.clickedIP = entry; 
-        console.log(this.networkData[entry]); 
     }
 
     createNetGraph() {
         var nodes = new DataSet();
 
-        nodes.add({id: "Internet", label: "Internet", x: 0, y: -500});
+        nodes.add({id: "Internet", x: 0, y: -600, shape: 'image', image: '../../assets/images/internet.png', size: 50});
         let x = 0; 
-        let y = -300; 
+        let y = -500; 
         for (let i = 0; i < this.ips.length; i++) {
             nodes.add({id: this.ips[i], label: this.ips[i], x: x, y: y});
             if (i == 0) {
                 x = 300;
-                y = -100;
+                y = -300;
             } else {
                 x -= 200; 
-                y = -100;
+                y = -300;
             }
         }
 
@@ -87,11 +104,12 @@ export class HomeComponent implements OnInit {
         var options = {
             edges: {
                 color: {
-                    color: 'black',
-                    highlight: 'red'
+                    color: 'white',
+                    highlight: 'blue'
                 },
                 smooth: true,
-                length: 300
+                length: 300,
+                width: 8
             },
             interaction: {
                 dragNodes: false,
@@ -106,60 +124,106 @@ export class HomeComponent implements OnInit {
                 fixed: {
                     x:true,
                     y:true
-                }
+                },
+                shape: 'box',
+                font: {
+                    size: 28
+                },
+                color: {
+                    background: '#7CCC77',
+                    border: '#253031'
+                },
+                borderWidth: 3
             }
 
         };
 
-        // initialize your network!
         var network = new Network(container, data, options);
-    }
 
-    createProtChart(ip, data) {
-        let protocols = data[ip].protocol; 
-        let labels = [];  
-        let counts = []; 
-        for (let prot in protocols) {
-            labels.push(prot); 
-            counts.push(protocols[prot]); 
-        } 
-        let protocolChart:any = []; 
-        /*protocolChart = new Chart(ip, {
-            type: 'pie', 
-            data: {
-                datasets: [{
-                    data: counts
-                }],
-                labels: labels
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: "Protocols For " + ip,
-                    fontColor: "green",
-                    fontSize: 48,
-                    padding: 20
+        //click event handler
+        let self = this; 
+        network.on("click", function (params) {
+            
+            console.log(self.networkData);
+            let trafficLabels = []; 
+            let trafficData = []; 
+            if (params.nodes[0] != "Internet") {
+                self.viewingIp = params.nodes[0];
+                console.log(self.networkData[params.nodes[0]]); 
+                var data = self.networkData[params.nodes[0]];
+                for (let key in data) {
+                    if (data[key].count && trafficLabels.length < 21) {
+                        trafficLabels.push(key); 
+                        trafficData.push(data[key].count); 
+                    } else if (trafficLabels.length > 20) {
+                        break; 
+                    }
                 }
+                console.log(trafficLabels); 
+                console.log(trafficData); 
+                self.packetChart = new Chart('trafficChart', {
+                    type: 'bar',
+
+                    data: {
+                        datasets: [{
+                            data: trafficData,
+                            backgroundColor: ["blue", "green", "red", "yellow", "orange", "purple"]
+                        }],
+                        labels: trafficLabels
+                    },
+                    options: {
+                        legend: {
+                            display: false
+                        },
+                        maintainAspectRatio: false,
+                        title: {
+                            display: true,
+                            text: "Packets Sent/Received"
+                        }
+                    }
+                });
+                let protLabels = [];
+                let protData = []; 
+                for (let key in data.protocol) {
+                    protLabels.push(key); 
+                    protData.push(data.protocol[key]); 
+                }
+                self.protChart = new Chart('protChart', {
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: protData,
+                            backgroundColor: ["blue", "green", "red", "yellow", "orange", "purple"]
+                        }],
+                        labels: protLabels
+                    }
+                })
             }
-        })
-        this.piCharts[ip] = protocolChart;  */
+        });
     }
 
     getData() {
-        this.networkData = {"172.27.0.15": {"172.27.0.90": {"count": 287}, "totalsize": 64440, "count": 287, "protocol": {"TCP": 240, "DATA-TEXT-LINES": 2, "JSON": 19, "HTTP": 26}, "length": 224}, 
-                            "172.27.0.78": {"totalsize": 630244, "port": {}, "224.0.0.251": {"count": 389}, "count": 5095, "172.27.0.90": {"count": 4618}, "172.27.255.255": {"count": 3}, "35.222.85.5": {"count": 11}, "35.224.99.156": {"count": 74}, "protocol": {"TCP": 137, "NBNS": 3, "DATA-TEXT-LINES": 1, "HTTP": 24, "_WS.MALFORMED": 1, "JSON": 7, "DNS": 4922}, "length": 123}, 
-                            "172.27.0.90": {"totalsize": 764260, "port": {}, "172.27.0.82": {"count": 4618}, "172.27.0.115": {"count": 10}, "count": 5313, "172.27.0.78": {"count": 287}, "172.27.0.135": {"count": 62}, "172.27.0.32": {"count": 336}, "protocol": {"TCP": 540, "DATA-TEXT-LINES": 3, "HTTP": 59, "_WS.MALFORMED": 1, "BOOTP": 116, "JSON": 51, "DNS": 4543}, "length": 143}, 
-                            "172.27.0.32": {"totalsize": 86898, "port": {}, "count": 336, "172.27.0.90": {"count": 336}, "protocol": {"TCP": 232, "BOOTP": 54, "JSON": 25, "HTTP": 25}, "length": 258}, 
-                            "172.27.0.12": {"172.27.0.90": {"count": 62}, "totalsize": 21204, "count": 62, "protocol": {"BOOTP": 62}, "length": 342}, 
-                            "172.27.0.115": {"173.194.12.91": {"count": 12}, "protocol": {"QUIC": 410, "TCP": 48, "SSL": 17, "HTTP": 16, "XML": 1, "DNS": 12}, "224.0.0.251": {"count": 2}, "172.217.6.78": {"count": 31}, "port": {}, "172.27.0.90": {"count": 10}, "239.255.255.250": {"count": 15}, "172.217.6.68": {"count": 19}, "length": 803, "172.217.0.42": {"count": 35}, "74.125.170.123": {"count": 11}, "74.125.170.122": {"count": 298}, "count": 504, "52.49.211.202": {"count": 13}, "216.58.194.174": {"count": 31}, "216.58.195.67": {"count": 5}, "172.217.5.106": {"count": 15}, "totalsize": 405081, "216.58.195.68": {"count": 7}}};        
-        this.networkLinks = {"172.27.0.15": ["172.27.0.90", "172.27.0.12", "172.27.0.32", "172.27.0.78"], "172.27.0.32": ["172.27.0.12"], "172.27.0.12": ["172.27.0.90"], "172.27.0.90": ["172.27.0.78"]};
         let trafficCounts = [];
-        let lengths = [];  
-        let protocolCounts = {};
+        let lengths = [];
+        let prots:any = []; 
+        let protCounts:any = []; 
+        let protMap = new Map();
         for (let key in this.networkData) {
             trafficCounts.push(this.networkData[key].count); 
             lengths.push(this.networkData[key].length); 
+            for (let prot in this.networkData[key]["protocol"]) {
+                if (protMap.has(prot))
+                    protMap.set(prot, protMap.get(prot) + this.networkData[key]['protocol'][prot]);
+                else 
+                    protMap.set(prot, this.networkData[key]['protocol'][prot]);
+            }
         }
+        prots = Array.from(protMap.keys()); 
+        protCounts = Array.from(protMap.values()); 
+        let protColors = []; 
+
+        console.log(prots);
+        console.log(protCounts);
         this.createNetGraph();
         this.trafficChart = new Chart('traffic', {
             type: 'bar',
@@ -191,22 +255,12 @@ export class HomeComponent implements OnInit {
                         }
                     }],
                 },
-                layout: {
-                    padding: {
-                        left: 100,
-                        right: 100, 
-                        top: 50,
-                        bottom: 50
-                    }
-                },
                 title: {
                     display: true,
                     text: "IP Traffic",
                     fontColor: "black",
-                    fontSize: 48,
-                    padding: 20
+                    fontSize: 30
                 },
-                events: [],
                 gridLines: {
                     color: "black",
                     lineWidth: 10
@@ -244,151 +298,44 @@ export class HomeComponent implements OnInit {
                         }
                     }],
                 },
-                layout: {
-                    padding: {
-                        left: 100,
-                        right: 100, 
-                        top: 50,
-                        bottom: 50
-                    }
-                },
                 title: {
                     display: true,
                     text: "Average Length of Packets",
                     fontColor: "black",
-                    fontSize: 48,
-                    padding: 20
+                    fontSize: 30
                 },
-                events: [],
                 gridLines: {
                     color: "black",
                     lineWidth: 10
                 }
             }
-        });
-        /*this.meshService.test().subscribe(
-        res => { 
-            this.networkData = res; 
-            console.log(this.networkData); 
-            
-            let trafficCounts = [];
-            let lengths = [];  
-            let protocolCounts = {}; 
-            
-            for (let key in this.networkData) {
-                if (key != "0.0.0.0")
-                    this.ips.push(key); 
-                this.createProtChart(key, this.networkData); 
-                trafficCounts.push(this.networkData[key].count); 
-                lengths.push(this.networkData[key].length); 
-            }
-            console.log(this.ips); 
-            this.createNetGraph();
-            this.trafficChart = new Chart('traffic', {
-                type: 'bar',
-                data: {
-                    labels: this.ips,
-                    datasets: [
-                        {
-                            data: trafficCounts,
-                            borderColor: 'blue',
-                            backgroundColor: 'blue'
-                        }
-                    ]
-                },
-                options: {
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            ticks: {
-                                fontSize: 15
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            ticks: {
-                                fontSize: 15
-                            }
-                        }],
-                    },
-                    layout: {
-                        padding: {
-                            left: 100,
-                            right: 100, 
-                            top: 50,
-                            bottom: 50
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: "IP Traffic",
-                        fontColor: "blue",
-                        fontSize: 48,
-                        padding: 20
-                    },
-                    events: [],
-                    gridLines: {
-                        color: "black",
-                        lineWidth: 10
-                    }
-                }
+        }); 
 
-            });
-            this.lengthChart = new Chart("length", {
-                type: 'bar',
-                data: {
-                    labels: this.ips,
-                    datasets: [
-                        {
-                            data: lengths,
-                            borderColor: 'red',
-                            backgroundColor: 'red'
-                        }
-                    ]
-                },
-                options: {
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            ticks: {
-                                fontSize: 15
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            ticks: {
-                                fontSize: 15
-                            }
-                        }],
-                    },
-                    layout: {
-                        padding: {
-                            left: 100,
-                            right: 100, 
-                            top: 50,
-                            bottom: 50
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: "Average Length of Packets",
-                        fontColor: "red",
-                        fontSize: 48,
-                        padding: 20
-                    },
-                    events: [],
-                    gridLines: {
-                        color: "black",
-                        lineWidth: 10
+        this.totalProtChart = new Chart("protocols", {
+            type: 'pie',
+            data: {
+                labels: prots,
+                datasets: [
+                    {
+                        data: protCounts,
+                        backgroundColor: ["#0074D9", "#FF4136", "#2ECC40", "#FF851B", "#7FDBFF", "#B10DC9", "#FFDC00", "#001f3f", "#39CCCC", "#01FF70", "#85144b", "#F012BE", "#3D9970", "#111111", "#AAAAAA"]
                     }
-                }
-            });
-        }
-    );*/
-}}
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Protocols Used",
+                    fontColor: "black",
+                    fontSize: 30
+                },
+            }
+        })
+    }
+
+    closeModal() {
+        this.viewingIp = null; 
+        this.packetChart.destroy(); 
+        this.protChart.destroy();
+    }
+}

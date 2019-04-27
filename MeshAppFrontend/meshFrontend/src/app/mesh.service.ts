@@ -9,8 +9,16 @@ import { map } from 'rxjs/operators';
 })
 export class MeshService {
 
-	public test(): Observable<any>  {
-		return this.http.get('http://172.27.0.82:3030/getFile')
+	public getPacketData(): Observable<any>  {
+		return this.http.get('http://172.27.0.15:3030/getFile')
+	}
+
+	public getLinks(): Observable<any> {
+		return this.http.get('http://172.27.0.15:3030/getArp')
+	}
+
+	public getIPs(): Observable<any> {
+		return this.http.get('http://172.27.0.15:3030/getIpList')
 	}
 
   constructor(private http: HttpClient) { }

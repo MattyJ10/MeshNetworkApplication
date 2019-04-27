@@ -4,23 +4,94 @@
 	margin: 0px auto;
 }
 
-ngx-graph {
-	height: 700px;
-	width: 50%;
-}
-
 .node:hover {
 	cursor:pointer;
 }
 
+.selectedTab {
+	background-color: #7CCC77;
+}
+
+.navButtons {
+	margin:0px auto;
+	text-align: center;
+	margin-top: 25px;
+	margin-bottom: 25px;
+}
+
+.navButton {
+	margin-left: 5px;
+	margin-right: 5px;
+	font-size: 30px;
+	border-radius: 5px;
+	box-shadow: 2px 2px 2px 2px #888888;
+}
+
+.navButton:hover {
+	cursor: pointer;
+}
+
+.navButton:focus {
+	outline: none;
+}
+
 #mynetwork {
-    border: 5px solid;
-    background: white;
+    border: 5px solid #05B2DC;
+    border-radius: 20px;
+    background: #dddddd;
     display: inline-block;
     height: 500px;
-    width: 50%;
+    width: 70%;
+    box-shadow: 5px 5px 5px 5px #888888;
+}
+
+.exit {
+	float: right;
 }
 
 .network {
 	text-align: center;
+}
+
+.bottomBut {
+	text-align: center;
+	display: block;
+	margin:0px auto;
+	font-size: 24px;
+}
+
+.view-data-modal {
+	position: absolute;
+	top: 50%;
+	left: 50%; 
+	transform: translate(-50%, -50%);
+	background-color: white;
+	text-align: center;
+	width: 90%;
+	height: 80%;
+	border: 2px solid;
+}
+
+.barChart {
+	height: 80%;
+	width: 45%;
+	display: inline-block;
+}
+
+.piChart {
+	height: 80%;
+	width: 45%;
+	display: inline-block;
+}
+
+.chartContainer {
+	width: 50%;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.piChartContainer {
+	width: 50%;
+	display: inline-block;
+	vertical-align: top;
 }

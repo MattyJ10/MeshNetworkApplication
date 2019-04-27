@@ -1,35 +1,37 @@
 <!-- <button (click)="test()">Test</button> -->
-<div class="network">
+
+<div class="navButtons">
+	<button [ngClass]="{'selectedTab': currentTab == 'network'}" class="navButton" (click)="currentTab='network'; closeModal()">Network</button>
+	<button [ngClass]="{'selectedTab': currentTab == 'data'}" class="navButton" (click)="currentTab='data'">Data</button>
+	<button [ngClass]="{'selectedTab': currentTab == 'tc'}" class="navButton" (click)="currentTab='tc'">Traffic Control</button>
+</div>
+
+<div [hidden]="currentTab != 'network'" class="network">
 	<div #graphContainer id="mynetwork" class="graph-container"></div>
 </div>
 
-
-<div>
-	<canvas id="traffic">{{testChart}}</canvas>
-</div>
-<div>
-	<canvas id="length">{{lengthChart}}</canvas>
-</div>
-
-<!-- <div class="view-data-modal"> 
+<div [hidden]="!viewingIp || currentTab != 'network'" class="view-data-modal"> 
+	<div class="exit">
+		<button (click)="closeModal()">X</button>
+	</div>
 	<h2 class="view-data-title">
-		{{clickedIP}}
+		{{viewingIp}}
 	</h2>
-	<label>Protocols</label>
-</div> -->
+	<div class="barChart">
+		<canvas id="trafficChart">{{packetChart}}</canvas>
+	</div>
+	<div class="piChart">
+		<canvas id="protChart">{{protChart}}</canvas>
+	</div>
+	<button class="bottomBut" (click)="closeModal()">Close</button>
+</div>
 
-<!-- <div>
-	<canvas id="172.27.0.15">{{piCharts[172.27.0.15]}}</canvas>
+<div [hidden]="currentTab != 'data'" class="dataTab">
+	<div class="chartContainer">
+		<canvas id="traffic">{{testChart}}</canvas>
+		<canvas id="length">{{lengthChart}}</canvas>
+	</div>
+	<div class="piChartContainer">
+		<canvas id="protocols">{{totalProtChart}}</canvas>
+	</div>
 </div>
-<div>
-	<canvas id="172.27.0.32">{{piCharts[172.27.0.32]}}</canvas>
-</div>
-<div>
-	<canvas id="172.27.0.12">{{piCharts[172.27.0.12]}}</canvas>
-</div>
-<div>
-	<canvas id="172.27.0.90">{{piCharts[172.27.0.90]}}</canvas>
-</div>
-<div>
-	<canvas id="172.27.0.78">{{piCharts[172.27.0.78]}}</canvas>
-</div> -->
