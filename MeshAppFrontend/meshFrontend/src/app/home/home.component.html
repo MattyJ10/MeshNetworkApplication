@@ -33,5 +33,29 @@
 	</div>
 	<div class="piChartContainer">
 		<canvas id="protocols">{{totalProtChart}}</canvas>
+		<canvas id="externals">{{externalChart}}</canvas>
+	</div>
+</div>
+
+<div class="tcTab" [hidden]="currentTab != 'tc'">
+	<div class="lists">
+		<div class="ipList">
+			<div class="inputContainer">
+				<label>Throttle IP:</label>
+				<input [(ngModel)]="throttleInput" name="ti">
+				<button (click)="throttleIP()">Submit</button>
+			</div>
+			<h1 class="listTitle">Throttled IPs</h1>
+			<p *ngFor="let ip of slowedIps">{{ip}}</p>
+		</div>
+		<div class="ipList">
+			<div class="inputContainer">
+				<label>Prioritize IP:</label>
+				<input [(ngModel)]="prioritizeInput" name="pi">
+				<button (click)="prioritizeIP()">Submit</button>
+			</div>
+			<h1 class="listTitle">Prioritized IPs</h1>
+			<p *ngFor="let ip of priorityIps">{{ip}}</p>
+		</div>
 	</div>
 </div>
